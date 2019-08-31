@@ -1,2 +1,2 @@
 # ReportGenerator
-Annotation based report generation built on Apache POI
+Annotation based report generation
