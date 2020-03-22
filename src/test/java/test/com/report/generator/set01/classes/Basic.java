@@ -1,6 +1,6 @@
-package test.com.oler.report.generator.set01.classes;
+package test.com.report.generator.set01.classes;
 
-import com.oler.report.generator.annotations.ReportColumn;
+import com.report.generator.annotations.ReportColumn;
 
 public class Basic {
 

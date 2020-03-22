@@ -1,16 +1,17 @@
-package com.oler.report.generator;
+package com.report.generator;
 
-import com.oler.report.generator.annotations.ReportColumn;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import com.report.generator.annotations.ReportColumn;
+
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.Map.Entry;
 
-public class ReportGenerator implements ReportGeneratorI{
+public class ReportGeneratorImpl implements ReportGenerator{
 
     @Override
     public Workbook generateReport(Collection<?> data, Class<?> type) throws NoSuchFieldException, IllegalAccessException {

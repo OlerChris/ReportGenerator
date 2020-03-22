@@ -1,4 +1,4 @@
-package com.oler.report.generator.annotations;
+package com.report.generator.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

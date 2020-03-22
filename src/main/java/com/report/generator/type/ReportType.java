@@ -1,4 +1,4 @@
-package com.oler.report.generator.type;
+package com.report.generator.type;
 
 public enum ReportType {
 
