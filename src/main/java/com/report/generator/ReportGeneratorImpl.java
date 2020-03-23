@@ -6,21 +6,28 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.report.generator.annotations.ReportColumn;
+import com.report.generator.exception.ReportGenerationException;
 
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.Map.Entry;
 
-public class ReportGeneratorImpl implements ReportGenerator{
+public class ReportGeneratorImpl<T> implements ReportGenerator<T>{
 
     @Override
-    public Workbook generateReport(Collection<?> data, Class<?> type) throws NoSuchFieldException, IllegalAccessException {
-        XSSFWorkbook workbook = new XSSFWorkbook();
-        formSheet(workbook, "data", data, type);
-        return workbook;
+    public Workbook generateReport(Collection<? extends T> data, Class<T> type) throws ReportGenerationException {
+    	try {
+    		XSSFWorkbook workbook = new XSSFWorkbook();
+    		formSheet(workbook, "data", data, type);
+    		return workbook;
+    	} catch (ReportGenerationException rge) {
+    		throw rge;
+    	} catch (Exception e) {
+    		throw new ReportGenerationException(e);
+    	}
     }
 
-    private void  formSheet(XSSFWorkbook workbook, String sheetName, Collection<?> data, Class<?> type) throws NoSuchFieldException, IllegalAccessException {
+    private void  formSheet(XSSFWorkbook workbook, String sheetName, Collection<?> data, Class<?> type) throws NoSuchFieldException, IllegalAccessException, ReportGenerationException {
         XSSFSheet sheet = workbook.createSheet(sheetName);
         Map<Integer, ColumnDefinition> columnDefinitions = determineColumns(type);
         createColumns(sheet, columnDefinitions);

@@ -8,6 +8,8 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
 public abstract class ReportGeneratorTest {
+	
+	private static String CELL_SIZE = "%8s";
 
     protected void assertValidRow(Row row, Object ... expected) {
 
@@ -36,17 +38,18 @@ public abstract class ReportGeneratorTest {
             while (cellIterator.hasNext()) {
 
                 Cell currentCell = cellIterator.next();
-                //getCellTypeEnum shown as deprecated for version 3.15
-                //getCellTypeEnum ill be renamed to getCellType starting from version 4.0
+                String cell = null;
                 if (currentCell.getCellType() == CellType.STRING) {
-                    System.out.print(currentCell.getStringCellValue() + "--");
+                	cell = currentCell.getStringCellValue();
                 } else if (currentCell.getCellType() == CellType.NUMERIC) {
-                    System.out.print(currentCell.getNumericCellValue() + "--");
+                    cell = String.valueOf(currentCell.getNumericCellValue());
                 }
+                System.out.print(String.format(CELL_SIZE, cell));
 
             }
             System.out.println();
-
         }
+        System.out.println();
     }
+    
 }
