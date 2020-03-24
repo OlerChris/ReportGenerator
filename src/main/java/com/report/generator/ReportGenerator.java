@@ -16,10 +16,10 @@ public interface ReportGenerator<T> {
 
 	/**
 	 * 
-	 * @param data
-	 * @param type
-	 * @return Workbook with 
-	 * @throws ReportGenerationException
+	 * @param data - Collection containing entries to populate rows of the report
+	 * @param type - The class of the data from which column headers are determined
+	 * @return Workbook object in XlSX format 
+	 * @throws ReportGenerationException if an issue occured while generating the Workbook
 	 */
     public Workbook generateReport(Collection<? extends T> data, Class<T> type) throws ReportGenerationException;
     

@@ -5,6 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.apache.poi.ss.usermodel.CellType;
+
 /**
  * Applied to a field to denote it corresponds to a particular column of a report
  * 
@@ -16,5 +18,6 @@ import java.lang.annotation.Target;
 public @interface ReportColumn {
 
     public String name();
+    public CellType cellType() default CellType._NONE;
 
 }
