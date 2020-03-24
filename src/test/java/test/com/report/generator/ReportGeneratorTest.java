@@ -12,7 +12,7 @@ import static junit.framework.TestCase.assertTrue;
 
 public abstract class ReportGeneratorTest {
 	
-	private static final String CELL_SIZE = "%8s";
+	private static final String CELL_SIZE = "%10.8s";
 	private static final boolean PRINT = true;
 	private static final boolean WRITE = true;
 
@@ -70,6 +70,8 @@ public abstract class ReportGeneratorTest {
                 	cell = currentCell.getStringCellValue();
                 } else if (currentCell.getCellType() == CellType.NUMERIC) {
                     cell = String.valueOf(currentCell.getNumericCellValue());
+                }else if (currentCell.getCellType() == CellType.BOOLEAN) {
+                    cell = String.valueOf(currentCell.getBooleanCellValue());
                 }
                 System.out.print(String.format(CELL_SIZE, cell));
 
