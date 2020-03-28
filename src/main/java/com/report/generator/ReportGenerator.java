@@ -15,7 +15,7 @@ import com.report.generator.exception.ReportGenerationException;
 public interface ReportGenerator<T> {
 
 	/**
-	 * 
+	 * Generates a Workbook based on a Class type and entries corresponding to a Collection of data
 	 * @param data - Collection containing entries to populate rows of the report
 	 * @param type - The class of the data from which column headers are determined
 	 * @return Workbook object in XlSX format 
