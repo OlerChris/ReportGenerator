@@ -31,34 +31,37 @@ import com.report.generator.type.ReportType;
 public class ReportGeneratorImpl<T> implements ReportGenerator<T>{
 
     @Override
-    public Workbook generateReport(Collection<? extends T> data, Class<T> type) throws ReportGenerationException {
-    	return generateReport(data, type, ReportType.XLSX);
+    public Workbook generateReport(String sheetName, Collection<? extends T> data, Class<T> type) throws ReportGenerationException {
+    	return generateReport(sheetName, data, type, ReportType.XLSX);
     }
     
     @Override
-    public Workbook generateReport(Collection<? extends T> data, Class<T> type, ReportType reportType) throws ReportGenerationException {
-    	Workbook workbook;
+    public Workbook generateReport(String sheetName, Collection<? extends T> data, Class<T> type, ReportType reportType) throws ReportGenerationException {
+    	Workbook workbook = null;
+    	if(sheetName == null) {
+    		sheetName = "sheet1";
+    	}
     	try {
 	    	switch(reportType) {
 			case CSV:
 				throw new ReportGenerationException("Workbooks can not be in CSV format. Try using generateCsv or writeReport methods.");
 			case XLS:
 				workbook = new HSSFWorkbook();
-	    		formSheet(workbook, "sheet1", data, type);
-	    		return workbook;
+	    		formSheet(workbook, sheetName, data, type);
+	    		break;
 			case XLSX:
 	    		workbook = new XSSFWorkbook();
-	    		formSheet(workbook, "sheet1", data, type);
-	    		return workbook;
+	    		formSheet(workbook, sheetName, data, type);
+	    		break;
 			default:
-				break;
+				throw new ReportGenerationException("ReportType not supported for generateReport");
 	    	}
     	} catch (ReportGenerationException rge) {
     		throw rge;
     	} catch (Exception e) {
     		throw new ReportGenerationException(e);
     	}
-    	return null;
+    	return workbook;
     }
 
 	private void formSheet(Workbook workbook, String sheetName, Collection<?> data, Class<?> type) throws NoSuchFieldException, IllegalAccessException, ReportGenerationException {

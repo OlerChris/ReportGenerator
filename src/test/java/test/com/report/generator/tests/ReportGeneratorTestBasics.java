@@ -14,6 +14,8 @@ import test.com.report.generator.classes.Mixed;
 import test.com.report.generator.classes.StringAndInt;
 import test.com.report.generator.classes.StringOnly;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +31,7 @@ public class ReportGeneratorTestBasics extends ReportGeneratorTest {
 
     @Test //Generating class with String fields only
     public void test01() throws ReportGenerationException, IOException {
+    	
     	ReportGenerator<StringOnly> generator = new ReportGeneratorImpl<>();
     			
         StringOnly x = new StringOnly("a","b");
@@ -37,7 +40,7 @@ public class ReportGeneratorTestBasics extends ReportGeneratorTest {
         data.add(x);
         data.add(y);
 
-        Workbook report = generator.generateReport(data, StringOnly.class);
+        Workbook report = generator.generateReport(null, data, StringOnly.class);
 
         printWorkbook(report);
 
@@ -51,6 +54,7 @@ public class ReportGeneratorTestBasics extends ReportGeneratorTest {
     
     @Test //Generating class with String, int, and Integer fields
     public void test02() throws ReportGenerationException, IOException {
+    	
     	ReportGenerator<StringAndInt> generator = new ReportGeneratorImpl<>();
 
     	StringAndInt x = new StringAndInt("a", 1, 2);
@@ -59,7 +63,7 @@ public class ReportGeneratorTestBasics extends ReportGeneratorTest {
         data.add(x);
         data.add(y);
 
-        Workbook report = generator.generateReport(data, StringAndInt.class);
+        Workbook report = generator.generateReport(null, data, StringAndInt.class);
 
         printWorkbook(report);
 
@@ -75,6 +79,7 @@ public class ReportGeneratorTestBasics extends ReportGeneratorTest {
     
     @Test //Generating class with String, all Primitives, all Wrappers, and a Class
     public void test03() throws ReportGenerationException, IOException {
+    	
     	ReportGenerator<Mixed> generator = new ReportGeneratorImpl<>();
 
     	Mixed x = new Mixed(
@@ -100,7 +105,7 @@ public class ReportGeneratorTestBasics extends ReportGeneratorTest {
         List<Mixed> data = new ArrayList<>();
         data.add(x);
 
-        Workbook report = generator.generateReport(data, Mixed.class);
+        Workbook report = generator.generateReport(null, data, Mixed.class);
 
         printWorkbook(report);
 
@@ -148,4 +153,21 @@ public class ReportGeneratorTestBasics extends ReportGeneratorTest {
         writeWorkbook(report, "Mixed.xlsx");
     }
 
+    @Test //Sheet Naming test
+    public void test04() throws ReportGenerationException, IOException {
+    	
+    	ReportGenerator<StringOnly> generator = new ReportGeneratorImpl<>();
+    	
+    	 StringOnly x = new StringOnly("a","b");
+         StringOnly y = new StringOnly("c","d");
+         List<StringOnly> data = new ArrayList<>();
+         data.add(x);
+         data.add(y);
+
+         Workbook report = generator.generateReport(null, data, StringOnly.class);
+         assertEquals("sheet1", report.getSheetName(0));
+         
+         report = generator.generateReport("Sheet Name", data, StringOnly.class);
+         assertEquals("Sheet Name", report.getSheetName(0));
+    }
 }

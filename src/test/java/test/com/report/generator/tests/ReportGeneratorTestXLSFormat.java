@@ -41,7 +41,7 @@ public class ReportGeneratorTestXLSFormat extends ReportGeneratorTest {
         data.add(x);
         data.add(y);
 
-        Workbook report = generator.generateReport(data, StringOnly.class, ReportType.XLS);
+        Workbook report = generator.generateReport(null, data, StringOnly.class, ReportType.XLS);
 
         printWorkbook(report);
 
@@ -64,7 +64,7 @@ public class ReportGeneratorTestXLSFormat extends ReportGeneratorTest {
         data.add(x);
         data.add(y);
 
-        Workbook report = generator.generateReport(data, StringAndInt.class, ReportType.XLS);
+        Workbook report = generator.generateReport(null, data, StringAndInt.class, ReportType.XLS);
 
         printWorkbook(report);
 
@@ -106,7 +106,7 @@ public class ReportGeneratorTestXLSFormat extends ReportGeneratorTest {
         List<Mixed> data = new ArrayList<>();
         data.add(x);
 
-        Workbook report = generator.generateReport(data, Mixed.class, ReportType.XLS);
+        Workbook report = generator.generateReport(null, data, Mixed.class, ReportType.XLS);
 
         printWorkbook(report);
 
@@ -158,7 +158,7 @@ public class ReportGeneratorTestXLSFormat extends ReportGeneratorTest {
     public void test04() throws ReportGenerationException {
     	
     	ReportGenerator<StringOnly> generator = new ReportGeneratorImpl<>();
-    	generator.generateReport(null, StringOnly.class, ReportType.CSV);
+    	generator.generateReport(null, null, StringOnly.class, ReportType.CSV);
     	
     }
 }
