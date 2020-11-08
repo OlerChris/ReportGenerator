@@ -45,7 +45,7 @@ public class ReportGeneratorImpl<T> implements ReportGenerator<T>{
 			case XLS:
 				workbook = new HSSFWorkbook();
 	    		formSheet(workbook, "sheet1", data, type);
-				break;
+	    		return workbook;
 			case XLSX:
 	    		workbook = new XSSFWorkbook();
 	    		formSheet(workbook, "sheet1", data, type);
