@@ -1,7 +1,10 @@
 package com.report.generator;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -10,6 +13,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.report.generator.annotations.ReportColumn;
 import com.report.generator.exception.CellTypeNotSupportedException;
 import com.report.generator.exception.ReportGenerationException;
+import com.report.generator.type.ReportType;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -26,28 +30,46 @@ public class ReportGeneratorImpl<T> implements ReportGenerator<T>{
 
     @Override
     public Workbook generateReport(Collection<? extends T> data, Class<T> type) throws ReportGenerationException {
+    	return generateReport(data, type, ReportType.XLSX);
+    }
+    
+    @Override
+    public Workbook generateReport(Collection<? extends T> data, Class<T> type, ReportType reportType) throws ReportGenerationException {
+    	Workbook workbook;
     	try {
-    		XSSFWorkbook workbook = new XSSFWorkbook();
-    		formSheet(workbook, "data", data, type);
-    		return workbook;
+	    	switch(reportType) {
+			case CSV:
+				throw new ReportGenerationException("Workbooks can not be in CSV format. Try using generateCsv or writeReport methods.");
+			case XLS:
+				workbook = new HSSFWorkbook();
+	    		formSheet(workbook, "sheet1", data, type);
+				break;
+			case XLSX:
+	    		workbook = new XSSFWorkbook();
+	    		formSheet(workbook, "sheet1", data, type);
+	    		return workbook;
+			default:
+				break;
+	    	}
     	} catch (ReportGenerationException rge) {
     		throw rge;
     	} catch (Exception e) {
     		throw new ReportGenerationException(e);
     	}
+    	return null;
     }
 
-    private void  formSheet(XSSFWorkbook workbook, String sheetName, Collection<?> data, Class<?> type) throws NoSuchFieldException, IllegalAccessException, ReportGenerationException {
-        XSSFSheet sheet = workbook.createSheet(sheetName);
+	private void formSheet(Workbook workbook, String sheetName, Collection<?> data, Class<?> type) throws NoSuchFieldException, IllegalAccessException, ReportGenerationException {
+        Sheet sheet = workbook.createSheet(sheetName);
         Map<Integer, ColumnDefinition> columnDefinitions = determineColumns(type);
         createColumns(sheet, columnDefinitions);
         populateColumns(sheet, data, columnDefinitions, type);
     }
 
-    private void populateColumns(XSSFSheet sheet, Collection<?> data, Map<Integer, ColumnDefinition> columnDefinitions, Class<?> type) throws ReportGenerationException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+    private void populateColumns(Sheet sheet, Collection<?> data, Map<Integer, ColumnDefinition> columnDefinitions, Class<?> type) throws ReportGenerationException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         int dataStart=1;
         for(Object item : data){
-            XSSFRow row = sheet.createRow(dataStart);
+            Row row = sheet.createRow(dataStart);
             for(int i =0; i<columnDefinitions.size(); i++){
                 ColumnDefinition def = columnDefinitions.get(i);
                 Field f = type.getDeclaredField(def.fieldName);
@@ -66,6 +88,7 @@ public class ReportGeneratorImpl<T> implements ReportGenerator<T>{
 					cell.setCellValue(Double.valueOf(value).doubleValue());
 					break;
 				case FORMULA:
+				case ERROR:
 				default:
 					throw new CellTypeNotSupportedException(def.celltype, f.getName());
                 }
@@ -74,8 +97,8 @@ public class ReportGeneratorImpl<T> implements ReportGenerator<T>{
         }
     }
 
-    private void createColumns(XSSFSheet sheet, Map<Integer, ColumnDefinition> columnDefinitions) {
-        XSSFRow row = sheet.createRow(0);
+    private void createColumns(Sheet sheet, Map<Integer, ColumnDefinition> columnDefinitions) {
+        Row row = sheet.createRow(0);
         for(Entry<Integer, ColumnDefinition> e : columnDefinitions.entrySet()) {
             row.createCell(e.getKey()).setCellValue(e.getValue().columnName);
         }
@@ -135,4 +158,5 @@ public class ReportGeneratorImpl<T> implements ReportGenerator<T>{
         String fieldName;
         CellType celltype;
     }
+	
 }

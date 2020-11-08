@@ -17,7 +17,14 @@ import org.apache.poi.ss.usermodel.CellType;
 @Target(ElementType.FIELD)
 public @interface ReportColumn {
 
+	/**
+	 * Name of the column in headers
+	 */
     public String name();
+    
+    /**
+     * Type of Cell field should be resolved to. CellType of _NONE will be automatically determined.
+     */
     public CellType cellType() default CellType._NONE;
 
 }

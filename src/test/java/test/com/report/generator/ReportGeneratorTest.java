@@ -50,9 +50,7 @@ public abstract class ReportGeneratorTest {
 	}
 
     protected void printWorkbook(Workbook wb){
-    	if(!PRINT) {
-    		return;
-    	}
+    	if(PRINT) {
     	
         Sheet datatypeSheet = wb.getSheetAt(0);
         Iterator<Row> iterator = datatypeSheet.iterator();
@@ -79,17 +77,17 @@ public abstract class ReportGeneratorTest {
             System.out.println();
         }
         System.out.println();
+    	}
     }
     
     protected void writeWorkbook(Workbook wb, String fileName) throws IOException {
-    	if(!WRITE) {
-    		return;
+    	if(WRITE) {
+	    	FileOutputStream fos = new FileOutputStream(new File(fileName));
+	    	wb.write(fos);
+	    	fos.flush();
+	    	wb.close();
+	    	fos.close();
     	}
-    	FileOutputStream fos = new FileOutputStream(new File(fileName));
-    	wb.write(fos);
-    	fos.flush();
-    	wb.close();
-    	fos.close();
     }
     
 }
