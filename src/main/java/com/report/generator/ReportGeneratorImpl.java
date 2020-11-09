@@ -16,6 +16,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellAddress;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.report.generator.annotations.ReportColumn;
@@ -29,11 +30,10 @@ import com.report.generator.type.ReportType;
  * Color
  * Header
  * Logo
- * Read
  * Multiple sheets
  * ColumnDefinition cache
- * filters
  * allow specifying exact CellAddress for reading files
+ * CSV
  */
 /**
  * Implementation of Report Generator
@@ -124,12 +124,17 @@ public class ReportGeneratorImpl<T> implements ReportGenerator<T>{
             }
             dataStart++;
         }
+        if(settings.isFiltersEnabled()) {
+        	int maxColumn = columnDefinitions.keySet().stream().mapToInt(x -> x).max().orElse(0);
+        	sheet.setAutoFilter(new CellRangeAddress(0, dataStart-1, 0, maxColumn));
+        }
     }
 
     private void createColumns(Sheet sheet, Map<Integer, ColumnDefinition> columnDefinitions) {
         Row row = sheet.createRow(0);
         for(Entry<Integer, ColumnDefinition> e : columnDefinitions.entrySet()) {
-            row.createCell(e.getKey()).setCellValue(e.getValue().columnName);
+            Cell cell = row.createCell(e.getKey());
+            cell.setCellValue(e.getValue().columnName);
         }
     }
 

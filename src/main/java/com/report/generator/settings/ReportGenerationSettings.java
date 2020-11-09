@@ -9,6 +9,7 @@ public class ReportGenerationSettings {
 	private int searchRadius = DEFAULT_SEARCH_RADIUS;
 	private int maxRowNum = MAX_ROW_NUMBER;
 	private boolean optimisticParsing = false;
+	private boolean filtersEnabled = true;
 
 	public boolean isPreserveNodes() {
 		return preserveNodes;
@@ -40,6 +41,14 @@ public class ReportGenerationSettings {
 
 	public void setOptimisticParsing(boolean optimisticParsing) {
 		this.optimisticParsing = optimisticParsing;
+	}
+
+	public boolean isFiltersEnabled() {
+		return filtersEnabled;
+	}
+
+	public void setFiltersEnabled(boolean filtersEnabled) {
+		this.filtersEnabled = filtersEnabled;
 	}
 	
 }
