@@ -39,6 +39,26 @@ public interface ReportGenerator<T> {
     public Workbook generateReport(String sheetName, Collection<? extends T> data, Class<T> type, ReportType reportType) throws ReportGenerationException;
     
     /**
+     * Reads the rows of a workbook and return a Collection of Data of the specified type
+     * @param wb - the Workbook to be Read
+     * @param type - The Class the individual rows are mapped to
+     * @return Collection of instances of the specified class
+     * @throws ReportGenerationException if Workbook could not be read
+     */
+    public Collection<T> readWorkbook(Workbook wb, Class<T> type) throws ReportGenerationException;
+    
+    /**
+     * Reads the rows of a workbook and return a Collection of Data of the specified type
+     * @param wb - the Workbook to be Read
+     * @param sheetName - the name of the sheet in the Workbook to be parsed
+     * @param type - The Class the individual rows are mapped to
+     * @return Collection of instances of the specified class
+     * @throws ReportGenerationException if Workbook could not be read
+     */
+	public Collection<T> readWorkbook(Workbook wb, String sheetName, Class<T> type) throws ReportGenerationException;
+
+    
+    /**
      * Helper method to write a Workbook to file system
      * @param wb - Workbook to be generated
      * @param pathName - location and name of the file to be created
@@ -50,7 +70,6 @@ public interface ReportGenerator<T> {
 	    	fos.flush();
 	    	wb.close();
 	    	fos.close();
-    }
-    
+    }    
 
 }

@@ -1,14 +1,18 @@
 package test.com.report.generator;
 
-import org.apache.poi.ss.usermodel.*;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+
+import com.report.generator.ReportGenerator;
 
 public abstract class ReportGeneratorTest {
 	
@@ -82,11 +86,7 @@ public abstract class ReportGeneratorTest {
     
     protected void writeWorkbook(Workbook wb, String fileName) throws IOException {
     	if(WRITE) {
-	    	FileOutputStream fos = new FileOutputStream(new File(fileName));
-	    	wb.write(fos);
-	    	fos.flush();
-	    	wb.close();
-	    	fos.close();
+    		ReportGenerator.writeWorkbook(wb, fileName);
     	}
     }
     

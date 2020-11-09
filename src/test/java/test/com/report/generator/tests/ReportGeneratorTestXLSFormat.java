@@ -50,7 +50,7 @@ public class ReportGeneratorTestXLSFormat extends ReportGeneratorTest {
         assertValidRow(sheet.getRow(1),"a","b");
         assertValidRow(sheet.getRow(2),"c","d");
         
-        writeWorkbook(report, "StringOnlyFlat.xlsx");
+        writeWorkbook(report, "StringOnlyFlat.xls");
     }
     
     @Test //Generating class with String, int, and Integer fields
@@ -75,7 +75,7 @@ public class ReportGeneratorTestXLSFormat extends ReportGeneratorTest {
         assertCellType(sheet,1,0,CellType.STRING);
         assertCellType(sheet,1,1,CellType.NUMERIC);
         assertCellType(sheet,1,2,CellType.NUMERIC);
-        writeWorkbook(report, "StringAndIntFlat.xlsx");
+        writeWorkbook(report, "StringAndIntFlat.xls");
     }
     
     @Test //Generating class with String, all Primitives, all Wrappers, and a Class
@@ -151,7 +151,7 @@ public class ReportGeneratorTestXLSFormat extends ReportGeneratorTest {
         assertCellType(sheet,1,16,CellType.NUMERIC);
         assertCellType(sheet,1,17,CellType.STRING);
 
-        writeWorkbook(report, "Mixed.xlsx");
+        writeWorkbook(report, "Mixed.xls");
     }
 
     @Test(expected = ReportGenerationException.class) // generateReport should throw exception for CSV type as it is not a workbook

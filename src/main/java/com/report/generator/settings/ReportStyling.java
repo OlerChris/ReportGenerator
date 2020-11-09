@@ -1,4 +1,4 @@
-package com.report.generator.style;
+package com.report.generator.settings;
 
 import java.util.Collection;
 
