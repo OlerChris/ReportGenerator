@@ -18,7 +18,7 @@ public abstract class ReportGeneratorTest {
 	
 	private static final String CELL_SIZE = "%10.8s";
 	private static final boolean PRINT = true;
-	private static final boolean WRITE = false;
+	private static final boolean WRITE = true;
 
 
     protected void assertValidRow(Row row, Object ... expected) {

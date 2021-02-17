@@ -1,5 +1,7 @@
 package com.report.generator;
 
+import java.awt.Dimension;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -12,25 +14,36 @@ import java.util.Map.Entry;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.ClientAnchor;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Drawing;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.Picture;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.CellUtil;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.report.generator.annotations.ReportColumn;
 import com.report.generator.exception.CellTypeNotSupportedException;
 import com.report.generator.exception.ReportGenerationException;
 import com.report.generator.exception.ReportReadingException;
-import com.report.generator.settings.ReportGenerationSettings;
+import com.report.generator.settings.ReportGeneratorSettings;
+import com.report.generator.settings.ReportStyling;
 import com.report.generator.type.ReportType;
 
 /*TODO LIST
+ * Inverse
  * Color
  * Header
- * Logo
+ * Title bar
  * Multiple sheets
+ * indent
  * ColumnDefinition cache
  * allow specifying exact CellAddress for reading files
  * CSV
@@ -44,14 +57,18 @@ import com.report.generator.type.ReportType;
  */
 public class ReportGeneratorImpl<T> implements ReportGenerator<T>{
 	
-	private ReportGenerationSettings settings;
+	private ReportGeneratorSettings settings;
 		
 	public ReportGeneratorImpl() {
-		this.settings = new ReportGenerationSettings();
+		this.settings = new ReportGeneratorSettings();
 	}
 	
-	public ReportGeneratorImpl(ReportGenerationSettings settings) {
+	public ReportGeneratorImpl(ReportGeneratorSettings settings) {
 		this.settings = settings;
+	}
+	
+	public ReportGeneratorSettings getSettings() {
+		return settings;
 	}
 
     @Override
@@ -71,10 +88,12 @@ public class ReportGeneratorImpl<T> implements ReportGenerator<T>{
 				throw new ReportGenerationException("Workbooks can not be in CSV format. Try using generateCsv or writeReport methods.");
 			case XLS:
 				workbook = new HSSFWorkbook();
+//				initWorkbook(workbook);
 	    		formSheet(workbook, sheetName, data, type);
 	    		break;
 			case XLSX:
 	    		workbook = new XSSFWorkbook();
+//	    		initWorkbook(workbook);
 	    		formSheet(workbook, sheetName, data, type);
 	    		break;
 			default:
@@ -88,15 +107,68 @@ public class ReportGeneratorImpl<T> implements ReportGenerator<T>{
     	return workbook;
     }
 
+//	private Workbook initWorkbook(Workbook workbook) throws ReportGenerationException {
+//		ReportStyling style = settings.getStyling();
+//		if(style.hasLogo()) {
+//			try {
+//				workbook.addPicture(style.getLogoImage(), style.getLogoPictureType());
+//			} catch (IOException e) {
+//				throw new ReportGenerationException("exception encountered trying to initialize logo", e);
+//			}
+//		}
+//		return workbook;
+//	}
+
 	private void formSheet(Workbook workbook, String sheetName, Collection<?> data, Class<?> type) throws NoSuchFieldException, IllegalAccessException, ReportGenerationException {
-        Sheet sheet = workbook.createSheet(sheetName);
+		ReportStyling style = settings.getStyling();
+		Sheet sheet = workbook.createSheet(sheetName);
         Map<Integer, ColumnDefinition> columnDefinitions = determineColumns(type);
-        createColumns(sheet, columnDefinitions);
-        populateColumns(sheet, data, columnDefinitions, type);
+        int headerRow = style.getHeaderRow();
+        createColumns(sheet, columnDefinitions, headerRow);
+        populateColumns(sheet, data, columnDefinitions, type, headerRow+1);
+        int maxColumn = columnDefinitions.keySet().stream().mapToInt(x -> x).max().orElse(0);
+        if(settings.isFiltersEnabled()) {
+        	sheet.setAutoFilter(new CellRangeAddress(headerRow, headerRow+1+data.size(), style.getStartColumn(), maxColumn + style.getStartColumn()));
+        }
+        if(style.hasLogo()) {
+        	formLogo(workbook, sheet, style, maxColumn);
+        }
     }
 
-    private void populateColumns(Sheet sheet, Collection<?> data, Map<Integer, ColumnDefinition> columnDefinitions, Class<?> type) throws ReportGenerationException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-        int dataStart=1;
+    private void formLogo(Workbook workbook, Sheet sheet, ReportStyling style, int maxColumn) throws ReportGenerationException {
+    	try {
+			int pictureIndex = workbook.addPicture(style.getLogoImage(), style.getLogoPictureType());
+			sheet.createRow(0);
+			sheet.getRow(0).setHeight((short) (15*style.getLogoHeight()));
+			CellRangeAddress logoRange= new CellRangeAddress(0,0,style.getStartColumn(),maxColumn + style.getStartColumn());
+			if(workbook instanceof XSSFWorkbook) {
+				XSSFCellStyle backgroundStyle = (XSSFCellStyle) workbook.createCellStyle();
+				backgroundStyle.setFillForegroundColor(new XSSFColor(style.getLogoBackgroundColor()));//TODO color map index
+				backgroundStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+				CellUtil.getCell(sheet.getRow(logoRange.getFirstRow()), logoRange.getFirstColumn()).setCellStyle(backgroundStyle);
+			}
+			sheet.addMergedRegion(logoRange);
+			CreationHelper helper = workbook.getCreationHelper();
+			Drawing<?> drawing = sheet.createDrawingPatriarch();
+			ClientAnchor anchor = helper.createClientAnchor();
+			anchor.setAnchorType( ClientAnchor.AnchorType.DONT_MOVE_AND_RESIZE );
+			anchor.setCol1( style.getStartColumn() );
+			anchor.setRow1( 0 );
+			anchor.setRow2( 0 );
+			anchor.setCol2( style.getStartColumn() );
+			Picture pict = drawing.createPicture( anchor, pictureIndex );
+			Dimension dimension = pict.getImageDimension();
+			double originalHeight = dimension.getHeight();
+			double originalWidth = dimension.getWidth();
+			pict.resize();
+			pict.resize(style.getLogoWidth()/originalWidth, style.getLogoHeight()/originalHeight);
+
+		} catch (IOException e) {
+			throw new ReportGenerationException("exception encountered trying to initialize logo", e);
+		}
+    }
+
+	private void populateColumns(Sheet sheet, Collection<?> data, Map<Integer, ColumnDefinition> columnDefinitions, Class<?> type, int dataStart) throws ReportGenerationException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         for(Object item : data){
             Row row = sheet.createRow(dataStart);
             for(int i =0; i<columnDefinitions.size(); i++){
@@ -124,14 +196,10 @@ public class ReportGeneratorImpl<T> implements ReportGenerator<T>{
             }
             dataStart++;
         }
-        if(settings.isFiltersEnabled()) {
-        	int maxColumn = columnDefinitions.keySet().stream().mapToInt(x -> x).max().orElse(0);
-        	sheet.setAutoFilter(new CellRangeAddress(0, dataStart-1, 0, maxColumn));
-        }
     }
 
-    private void createColumns(Sheet sheet, Map<Integer, ColumnDefinition> columnDefinitions) {
-        Row row = sheet.createRow(0);
+    private void createColumns(Sheet sheet, Map<Integer, ColumnDefinition> columnDefinitions, int headerRow) {
+        Row row = sheet.createRow(headerRow);
         for(Entry<Integer, ColumnDefinition> e : columnDefinitions.entrySet()) {
             Cell cell = row.createCell(e.getKey());
             cell.setCellValue(e.getValue().columnName);

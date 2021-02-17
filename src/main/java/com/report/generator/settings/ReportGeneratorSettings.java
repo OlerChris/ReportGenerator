@@ -1,6 +1,7 @@
 package com.report.generator.settings;
 
-public class ReportGenerationSettings {
+
+public class ReportGeneratorSettings {
 	
 	public static final int DEFAULT_SEARCH_RADIUS = 50;
 	public static final int MAX_ROW_NUMBER = Integer.MAX_VALUE;
@@ -10,45 +11,56 @@ public class ReportGenerationSettings {
 	private int maxRowNum = MAX_ROW_NUMBER;
 	private boolean optimisticParsing = false;
 	private boolean filtersEnabled = true;
+	
+	private final ReportStyling styling = new ReportStyling();
 
 	public boolean isPreserveNodes() {
 		return preserveNodes;
 	}
 
-	public void setPreserveNodes(boolean preserveNodes) {
+	public ReportGeneratorSettings setPreserveNodes(boolean preserveNodes) {
 		this.preserveNodes = preserveNodes;
+		return this;
 	}
 
 	public int getSearchRadius() {
 		return searchRadius;
 	}
 
-	public void setSearchRadius(int searchRadius) {
+	public ReportGeneratorSettings setSearchRadius(int searchRadius) {
 		this.searchRadius = searchRadius;
+		return this;
 	}
 
 	public int getMaxRowNum() {
 		return maxRowNum;
 	}
 
-	public void setMaxRowNum(int maxRowNum) {
+	public ReportGeneratorSettings setMaxRowNum(int maxRowNum) {
 		this.maxRowNum = maxRowNum;
+		return this;
 	}
 
 	public boolean isOptimisticParsing() {
 		return optimisticParsing;
 	}
 
-	public void setOptimisticParsing(boolean optimisticParsing) {
+	public ReportGeneratorSettings setOptimisticParsing(boolean optimisticParsing) {
 		this.optimisticParsing = optimisticParsing;
+		return this;
 	}
 
 	public boolean isFiltersEnabled() {
 		return filtersEnabled;
 	}
 
-	public void setFiltersEnabled(boolean filtersEnabled) {
+	public ReportGeneratorSettings setFiltersEnabled(boolean filtersEnabled) {
 		this.filtersEnabled = filtersEnabled;
+		return this;
+	}
+
+	public ReportStyling getStyling() {
+		return styling;
 	}
 	
 }

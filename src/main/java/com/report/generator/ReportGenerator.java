@@ -8,6 +8,7 @@ import java.util.Collection;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import com.report.generator.exception.ReportGenerationException;
+import com.report.generator.settings.ReportGeneratorSettings;
 import com.report.generator.type.ReportType;
 
 /**
@@ -57,6 +58,11 @@ public interface ReportGenerator<T> {
      */
 	public Collection<T> readWorkbook(Workbook wb, String sheetName, Class<T> type) throws ReportGenerationException;
 
+	/**
+	 * Returns settings for report generation
+	 * @return ReportGenerationSettings instance
+	 */
+	public ReportGeneratorSettings getSettings();
     
     /**
      * Helper method to write a Workbook to file system
